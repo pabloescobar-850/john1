@@ -7,152 +7,94 @@
 
 #!/bin/bash
 
-FILE="addressbook.txt"
+file="addressbook.txt"
 
-# Create a new address book
-create_book()
-{
-    > "$FILE"
-    echo "Address book created successfully."
-}
-
-# View all records
-view_book()
-{
-    if [ -f "$FILE" ]
-    then
-        if [ -s "$FILE" ]
-        then
-            printf "%-15s %-5s %-7s %-7s %-12s %-12s %-10s\n" "Name" "Age" "Grade" "Marks" "Gender" "Department" "Hosteller"
-            echo "--------------------------------------------------------------------------"
-
-            while IFS="|" read -r name age grade marks gender dept hosteller
-            do
-                printf "%-15s %-5s %-7s %-7s %-12s %-12s %-10s\n" "$name" "$age" "$grade" "$marks" "$gender" "$dept" "$hosteller"
-            done < "$FILE"
-        else
-            echo "Address book is empty."
-        fi
-    else
-        echo "Address book does not exist."
-    fi
-}
-
-# Insert a new record
-insert_record()
-{
-    echo "Enter Name:"
-    read name
-
-    echo "Enter Age:"
-    read age
-
-    echo "Enter Grade:"
-    read grade
-
-    echo "Enter Marks:"
-    read marks
-
-    echo "Enter Gender:"
-    read gender
-
-    echo "Enter Department:"
-    read dept
-
-    echo "Enter Hosteller (Yes/No):"
-    read hosteller
-
-    echo "$name|$age|$grade|$marks|$gender|$dept|$hosteller" >> "$FILE"
-
-    echo "Record inserted successfully."
-}
-
-# Delete a record by name
-delete_record()
-{
-    echo "Enter Name to delete:"
-    read name
-
-    if grep -q "^$name|" "$FILE"
-    then
-        sed -i "/^$name|/d" "$FILE"
-        echo "Record deleted successfully."
-    else
-        echo "Record not found."
-    fi
-}
-
-# Modify an existing record
-modify_record()
-{
-    echo "Enter Name to modify:"
-    read name
-
-    if grep -q "^$name|" "$FILE"
-    then
-        echo "Enter New Age:"
-        read age
-
-        echo "Enter New Grade:"
-        read grade
-
-        echo "Enter New Marks:"
-        read marks
-
-        echo "Enter New Gender:"
-        read gender
-
-        echo "Enter New Department:"
-        read dept
-
-        echo "Enter New Hosteller (Yes/No):"
-        read hosteller
-
-        sed -i "s/^$name|.*/$name|$age|$grade|$marks|$gender|$dept|$hosteller/" "$FILE"
-
-        echo "Record modified successfully."
-    else
-        echo "Record not found."
-    fi
-}
-
-# Display menu repeatedly
 while true
 do
-    echo
-    echo "============================== ADDRESS BOOK =============================="
+    echo "----------------------------"
+    echo "       ADDRESS BOOK"
+    echo "----------------------------"
     echo "1. Create Address Book"
     echo "2. View Address Book"
     echo "3. Insert Record"
     echo "4. Delete Record"
     echo "5. Modify Record"
     echo "6. Exit"
-    echo "==========================================================================="
-    echo "Enter your choice:"
-    read choice
+
+    read -p "Enter your choice: " choice
 
     case $choice in
         1)
-            create_book
+            # Create a new address book
+            touch "$file"
+            echo "Address Book Created Successfully!"
             ;;
+
         2)
-            view_book
+            # Display all records
+            if [ -s "$file" ]; then
+                echo "Name | Phone | Email"
+                cat "$file"
+            else
+                echo "Address Book is Empty!"
+            fi
             ;;
+
         3)
-            insert_record
+            # Insert a new record
+            read -p "Enter Name: " name
+            read -p "Enter Phone: " phone
+            read -p "Enter Email: " email
+
+            # Save record in file
+            echo "$name | $phone | $email" >> "$file"
+            echo "Record Inserted Successfully!"
             ;;
+
         4)
-            delete_record
+            # Delete a record using name
+            read -p "Enter Name to Delete: " name
+
+            if [ -f "$file" ]; then
+                grep -Fv "$name |" "$file" > temp.txt
+                mv temp.txt "$file"
+                echo "Record Deleted!"
+            else
+                echo "Address Book Not Found!"
+            fi
             ;;
+
         5)
-            modify_record
+            # Modify an existing record
+            read -p "Enter Name to Modify: " name
+
+            if [ -f "$file" ]; then
+                # Remove old record
+                grep -Fv "$name |" "$file" > temp.txt
+                mv temp.txt "$file"
+
+                # Enter updated details
+                read -p "Enter New Name: " newname
+                read -p "Enter New Phone: " phone
+                read -p "Enter New Email: " email
+
+                # Add updated record
+                echo "$newname | $phone | $email" >> "$file"
+                echo "Record Modified Successfully!"
+            else
+                echo "Address Book Not Found!"
+            fi
             ;;
+
         6)
+            # Exit the program
             echo "Exiting Address Book..."
-            break
+            exit 0
             ;;
+
         *)
-            echo "Invalid choice."
+            # Handle invalid menu choice
+            echo "Invalid Choice! Try Again."
             ;;
     esac
 done
