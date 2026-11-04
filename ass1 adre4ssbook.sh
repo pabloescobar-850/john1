@@ -145,3 +145,87 @@ done
 chmod +x addressbook.sh
 ./addressbook.sh 
 //above wala in terminal
+
+
+
+COde part 2 
+
+#!/bin/bash
+FILE="addressbook.txt"
+
+while true
+do
+        echo "------ADDRESS BOOK-------"
+        echo "1. Create a address book"
+        echo "2. View a addrress book"
+        echo "3. Insert a record into book"
+        echo "4. Delete a record into book"
+        echo "5. Modify a record into book"
+        echo "6. Exit"
+        read -r -p "Enter the choice " choice
+        case "$choice" in
+
+        1)
+            echo -e "NAME\tADDRESS\tPHONE\tBRANCH\tCGPA\tHOSTEL" > "$FILE"
+            echo "Address book created successfully"
+            ;;
+
+        2)
+            if [ -f "$FILE" ] && [ -s "$FILE" ]; then
+                cat "$FILE"
+            else
+                 echo "BOOK IS EMPTY NOTHING TO SHOW"
+            fi
+            ;;
+
+        3)
+           if [ ! -f "$FILE" ]; then
+              echo -e "NAME\tADDRESS\tPHONE\tBRANCH\tCGPA\tHOSTEL" > "$FILE"
+           fi
+           read -r -p "Enter the name to insert:- " name
+           read -r -p "Enter the address of student:- " add
+           read -r -p "Enter the phone of student:- " phone
+           read -r -p "Enter the branch of student:- " branch
+           read -r -p "Enter the cgpa of student:- " cgpa
+           read -r -p "Enter hostellite or not(y/n):- " hostel
+           echo -e "$name\t$add\t$phone\t$branch\t$cgpa\t$hostel" >> "$FILE"
+           echo "Record inserted successfully"
+           ;;
+
+        4)
+           read -r -p "Enter the name of the recordd to delete:- " name
+           grep -v "^${name}$(printf '\t')" "$FILE" > temp
+           mv temp "$FILE"
+           echo "Record deleted successfulyy"
+           ;;
+
+        5)
+           read -r -p "Enter the name of the record to modify:- " name
+           grep -v "^${name}$(printf '\t')" "$FILE" > temp
+           mv temp "$FILE"
+           read -r -p "ENter the new name :- " newname
+           read -r -p "Enter the new add:- " newadd
+           read -r -p "Enter the new phone:- " newphone
+           read -r -p "Enter the new branch:- " newbranch
+           read -r -p "Enter the new cgpa:- " newcgpa
+           read -r -p "Enter the new status of hostellite(y/n)?:- " newhostel
+           printf "%s\t%s\t%s\t%s\t%s\t%s\n" "$newname" "$newadd" "$newphone" "$newbranch" "$newcgpa" "$newhostel" >> "$FILE"
+           echo "Record modified succesfully"
+           ;;
+        6)
+           echo "Exiting, thank you!!!"
+           exit
+           ;;
+        *)
+           echo "Inavlid input , try again"
+           ;;
+        esac
+done
+
+//save as addressbook.sh
+
+
+//after that 
+chmod +x addressbook.sh
+./addressbook.sh 
+//above wala in terminal
